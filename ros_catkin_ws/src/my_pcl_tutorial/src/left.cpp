@@ -1,13 +1,10 @@
 #include <ros/ros.h>
-// PCL specific includes
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl_ros/point_cloud.h>
 #include <pcl_ros/transforms.h>
 #include <pcl/point_types.h>
 #include <tf/tf.h>
 #include <iostream>
-
-//TODO: 1. Use easier transform 2. can we not convert to pointcloud? 3. change reference frame
 
 ros::Publisher pub;
 std::string target_frame;
@@ -40,7 +37,7 @@ int main (int argc, char** argv)
   // Create a ROS subscriber for the input point cloud
   ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2>("/left_velodyne/velodyne_points", 10, cloud_cb);
   // Create a ROS publisher for the output model coefficients
-  pub = nh.advertise<sensor_msgs::PointCloud2>("/velodyne_points", 10);
+  pub = nh.advertise<sensor_msgs::PointCloud2>("/left_velodyne/transformed", 10);
 
   // Spin
   ros::spin ();

@@ -6,7 +6,9 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find blam_example)/rviz/lidar_slam.rviz" />
   <node name="tf_odometry_baselink" pkg="velodyne_frame_tf" type="frame_tf_broadcaster" />
-  <node pkg="my_pcl_tutorial" name="left_velodyne2velodyne" type="left"></node>
+  <node pkg="my_pcl_tutorial" name="left_velodyne_transform" type="left"></node>
+  <node pkg="my_pcl_tutorial" name="right_velodyne_transform" type="right"></node>
+  <node pkg="merge_pcl" name="merge" type="merge"></node>
 
   <group ns="blam">
     <!-- SLAM -->
@@ -19,18 +21,10 @@
       <remap from="~pcld" to="/velodyne_points"/>
 
       <!-- Initial pose -->
-      <!-- 
       <rosparam param="init">
         position: {x: 0, y: 0, z: 0}
         orientation: {roll: 0, pitch: 0, yaw: 0}
-        position_sigma: {x: 0.1, y: 0.1, z: 0.1}
-        orientation_sigma: {roll: 0.02, pitch: 0.02, yaw: 0.02}
-      </rosparam>
-       -->
-      <rosparam param="init">
-        position: {x: 0, y: 0, z: 0}
-        orientation: {roll: 0, pitch: 0, yaw: 0}
-        position_sigma: {x: 0.1, y: 0.1, z: 0.1}
+        position_sigma: {x: 0.02, y: 0.02, z: 0.02}
         orientation_sigma: {roll: 0.02, pitch: 0.02, yaw: 0.02}
       </rosparam>
 
