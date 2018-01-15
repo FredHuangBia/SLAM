@@ -527,6 +527,8 @@ bool LaserLoopClosure::PerformICP(const PointCloud::ConstPtr& scan1,
   // If the loop closure was a success, publish the two scans.
   source->header.frame_id = fixed_frame_id_;
   target->header.frame_id = fixed_frame_id_;
+  // For ICP visualization
+  target->header.stamp = source->header.stamp;
   scan1_pub_.publish(*source);
   scan2_pub_.publish(*target);
 
