@@ -34,7 +34,12 @@ int main (int argc, char** argv)
   // Create a ROS subscriber for the input point cloud
   ros::Subscriber sub = nh.subscribe<sensor_msgs::PointCloud2>("/right_velodyne/velodyne_points", 10, cloud_cb);
   // Create a ROS publisher for the output model coefficients
-  pub = nh.advertise<sensor_msgs::PointCloud2>("/right_velodyne/transformed", 10);
+  if(strcmp(argv[1], "both") == 0){
+    pub = nh.advertise<sensor_msgs::PointCloud2>("/right_velodyne/transformed", 10);
+  }
+  else{
+    pub = nh.advertise<sensor_msgs::PointCloud2>("/velodyne_points", 10);
+  }
 
   // Spin
   ros::spin ();

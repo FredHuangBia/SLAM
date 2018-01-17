@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="UST-10LX">
+  <xacro:macro name="UST-10LX" params="parent name color *origin">
+    <link name="${name}_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://star_jackal_mapper_description/meshes/UST-10LX.stl" />
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <material name="${color}" />
+      </visual>
+    </link>
+
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="${name}_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+  </xacro:macro>
+</robot>

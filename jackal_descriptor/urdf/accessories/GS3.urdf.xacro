@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="GS3">
+  <xacro:macro name="GS3" params="parent name *origin">
+
+    <link name="${name}_link">
+      <visual>
+        <geometry>
+          <mesh filename="package://star_jackal_mapper_description/meshes/GS3.stl"/>
+        </geometry>
+        <origin xyz="0 0 0" />
+        <material name="white" />
+      </visual>
+    </link>
+
+    <joint name="${name}_joint" type="fixed">
+      <parent link="${parent}" />
+      <child link="${name}_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+
+  </xacro:macro>
+
+</robot>

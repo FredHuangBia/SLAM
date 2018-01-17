@@ -1,0 +1,267 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!--
+    As you add to this URDF, please be aware that both the robot and
+    simulation include it. You must retain compatibility with all of
+    the following launch files:
+
+    jackal_viz/launch/view_model.launch
+    jackal_gazebo/launch/jackal_world.launch
+    jackal_base/launch/base.launch
+  -->
+
+  <!-- Macros to generate standoffs for offset payload mounting. -->
+  <xacro:include filename = "accessories/standoffs.urdf.xacro" />
+  <!-- PointGrey GS3 Camera -->
+  <xacro:include filename = "accessories/GS3.urdf.xacro"       />
+  <!-- XSENS MTi-30 -->
+  <xacro:include filename = "accessories/MTI-30.urdf.xacro"    />
+  <!-- HOKUYO UST-10LX -->
+  <xacro:include filename = "accessories/UST-10LX.urdf.xacro"  />
+  <!-- Velodyne HDL-32E -->
+  <xacro:include filename = "accessories/HDL-32E.urdf.xacro"   />
+
+  <!-- property parameters -->
+  <xacro:property name="sensor_board_length"          value="0.47"    />
+  <xacro:property name="sensor_board_width"           value="0.3"     />
+  <xacro:property name="sensor_board_height"          value="0.008"   />
+  <!-- the thickness of sensor_board, we should count it -->
+  <xacro:property name="sensor_board_height_offset"   value="${sensor_board_height*0.5}"   />
+  <xacro:property name="aluminum_support_height"      value="0.05"    />
+
+  <!--============-->
+  <!-- board link -->
+  <!--============-->
+  <link name="board_link">
+	<visual>
+	  <geometry>
+        <box size="${sensor_board_length} ${sensor_board_width} ${sensor_board_height}" />
+      </geometry>
+	  <origin xyz="0 0 0"    />
+	  <material name="black" />
+	</visual>
+  </link>
+
+  <!-- board_joint -->
+  <joint name="board_joint" type="fixed">
+	<parent link="chassis_link" />
+	<child link="board_link"    />
+    <origin xyz="0 0 ${chassis_height+sensor_board_height_offset+aluminum_support_height}" rpy="0 0 0" />
+  </joint>
+
+  <!--================-->
+  <!-- xsens_imu_link -->
+  <!--================-->
+
+  <!--<MTI-30 name="xsens_imu" parent="board_link" >-->
+    <!--<origin xyz="0 0 -0.004" rpy="0 ${PI} ${-PI/2}" />-->
+  <!--</MTI-30>-->
+
+  <!--<link name="xsens_imu_link">-->
+	<!--<visual>-->
+	  <!--<geometry>-->
+	    <!--<box size="0.0565 0.0414 0.0234" />-->
+	  <!--</geometry>-->
+	  <!--<origin xyz="0 0 0" />-->
+	  <!--<material name="orange" />-->
+	<!--</visual>-->
+  <!--</link>-->
+
+  <!--&lt;!&ndash; xsens_imu_joint &ndash;&gt;-->
+  <!--<joint name="xsens_imu_joint" type="fixed">-->
+	<!--<parent link="board_link" />-->
+	<!--<child  link="xsens_imu_link" />-->
+	<!--<origin xyz="0 -0.0164 -0.0121" rpy="0 ${PI} 0" />-->
+  <!--</joint>-->
+
+  <!--========================-->
+  <!-- horizontal_hokuyo_link -->
+  <!--========================-->
+
+  <!-- from front_sensor_board to front_board aluminum_support length -->
+  <xacro:property name="horizontal_laser_x_offset"   value="0.013"  />
+  <!-- hokuyo width from offical datasheet of ust-10lx -->
+  <xacro:property name="hokuyo_width"                value="0.05"   />
+  <!-- hokuyo model z offset check xyz = (0 0 0) origin -->
+  <xacro:property name="horizontal_laser_z_offset"   value="0.001"  />
+
+  <!--==================================-->
+  <!-- proof of horizontal hokuyo laser -->
+  <!--<link name="horizontal_laser_offset_link">-->
+    <!--<visual>-->
+      <!--<geometry>-->
+        <!--<box size="${horizontal_laser_x_offset} ${sensor_board_width} ${sensor_board_height}"     />-->
+      <!--</geometry>-->
+      <!--<origin xyz="0 0 0"    />-->
+      <!--<material name="white" />-->
+    <!--</visual>-->
+  <!--</link>-->
+
+  <!-- board_joint -->
+  <!--<joint name="horizontal_laser_offset_joint" type="fixed">-->
+    <!--<parent link="board_link" />-->
+    <!--<child  link="horizontal_laser_offset_link"    />-->
+    <!--<origin xyz ="${(sensor_board_length-horizontal_laser_x_offset)*0.5} 0 ${sensor_board_height}" />-->
+  <!--</joint>-->
+  <!--================================-->
+
+  <!-- UST-10LX -->
+  <UST-10LX name="horizontal_hokuyo" parent="board_link" color="cyan" >
+    <origin xyz ="${sensor_board_length*0.5-horizontal_laser_x_offset-hokuyo_width*0.5} 0 ${aluminum_support_height+sensor_board_height+horizontal_laser_z_offset}" rpy="0 0 0" />
+  </UST-10LX>
+
+  <!--======================-->
+  <!-- vertical_hokuyo_link -->
+  <!--======================-->
+
+  <!-- from front_sensor_board to top_front_board aluminum_support length -->
+  <xacro:property name="vertical_laser_x_offset"   value="0.211" />
+  <!-- from sensor_board to vertical laser beam circle -->
+  <xacro:property name="vertical_laser_height"     value="0.14"  />
+  <!-- hokuyo height from offical datasheet of ust-10lx -->
+  <xacro:property name="hokuyo_height"             value="0.07"  />
+  <!-- avoid deadlock for roll and yaw, add tuning parameter -->
+  <xacro:property name="tuning_deadlock_param"     value="${-1.5*PI/180}"  />
+
+  <!--================================-->
+  <!-- proof of vertical hokuyo laser -->
+  <!--<link name="vertical_laser_offset_link">-->
+    <!--<visual>-->
+      <!--<geometry>-->
+        <!--<box size="${vertical_laser_x_offset} ${sensor_board_width} ${sensor_board_height*2}" />-->
+          <!--</geometry>-->
+          <!--<origin xyz="0 0 0"    />-->
+          <!--<material name="white" />-->
+    <!--</visual>-->
+  <!--</link>-->
+
+  <!--&lt;!&ndash; board_joint &ndash;&gt;-->
+  <!--<joint name="vertical_laser_offset_joint" type="fixed">-->
+    <!--<parent link="board_link" />-->
+    <!--<child  link="vertical_laser_offset_link"    />-->
+    <!--<origin xyz ="${(sensor_board_length-vertical_laser_x_offset)*0.5} 0 0" />-->
+  <!--</joint>-->
+  <!--================================-->
+
+  <!-- a virtual link to compensate the roll of vertical hokuyo, dead-lock yrp program -->
+  <link name="virtual_link" />
+  <joint name="virtual_joint" type="fixed">
+    <parent link="board_link" />
+    <child link="virtual_link"    />
+    <origin xyz="0 0 0" rpy="${tuning_deadlock_param} 0 0" />
+  </joint>
+
+  <!--================================-->
+
+  <UST-10LX name="vertical_hokuyo" parent="virtual_link" color="yellow" >
+    <origin xyz="${hokuyo_height+sensor_board_height} 0 ${vertical_laser_height+0.01}" rpy="0 ${-PI/2} ${PI}" />
+  </UST-10LX>
+
+  <!--======================-->
+  <!--        cameras       -->
+  <!--======================-->
+
+  <!--<GS3 name="front_left_camera" parent="board_link" >-->
+    <!--<origin xyz="${(chassis_length+0.06)*0.5-0.05+0.027} ${chassis_width*0.5+0.021} ${0.0145+0.004}" rpy="${PI/2} 0 ${PI/2}" />-->
+  <!--</GS3>-->
+
+  <!--<GS3 name="front_right_camera" parent="board_link" >-->
+    <!--<origin xyz="${(chassis_length+0.06)*0.5-0.05+0.027} ${-chassis_width*0.5-0.021} ${0.0145+0.004}" rpy="${PI/2} 0 ${PI/2}" />-->
+  <!--</GS3>-->
+
+  <!--<GS3 name="upper_left_camera" parent="board_link" >-->
+    <!--<origin xyz="-0.03 ${chassis_width*0.5+0.021} ${0.1+0.029}" rpy="0 0 ${-PI/2}" />-->
+  <!--</GS3>-->
+
+  <!--<GS3 name="upper_right_camera" parent="board_link" >-->
+    <!--<origin xyz="-0.03 ${-chassis_width*0.5-0.021} ${0.1+0.029}" rpy="0 0 ${-PI/2}" />-->
+  <!--</GS3>-->
+
+  <!--<GS3 name="front_right_camera" parent="board_link" >-->
+    <!--<origin xyz="${(chassis_length+0.06)*0.5-0.05+0.027} ${-chassis_width*0.5-0.021} ${0.0145+0.004}" rpy="${PI/2} 0 ${PI/2}" />-->
+  <!--</GS3>-->
+
+
+    <!--<link name="front_left_camera_link">-->
+	<!--<visual>-->
+	  <!--<geometry>-->
+	    <!--<box size="0.044 0.029 0.0954" />-->
+	  <!--</geometry>-->
+	  <!--<origin xyz="0 0 -0.047" />-->
+	  <!--<material name="black" />-->
+	<!--</visual>-->
+  <!--</link>-->
+  <!--<joint name="front_left_camera_joint" type="fixed">-->
+	<!--<parent link="board_link" />-->
+	<!--<child link="front_left_camera_link" />-->
+	<!--<origin xyz="0.23964 0.12564 0.0185" rpy="${-PI/2} 0 ${-PI/2}" />-->
+  <!--</joint>-->
+
+  <!--<link name="front_right_camera_link">-->
+	<!--<visual>-->
+	  <!--<geometry>-->
+	    <!--<box size="0.044 0.029 0.0954" />-->
+	  <!--</geometry>-->
+	  <!--<origin xyz="0 0 -0.047" />-->
+	  <!--<material name="black" />-->
+	<!--</visual>-->
+  <!--</link>-->
+  <!--<joint name="front_right_camera_joint" type="fixed">-->
+	<!--<parent link="board_link" />-->
+	<!--<child link="front_right_camera_link" />-->
+	<!--<origin xyz="0.23912 -0.13633 0.0185" rpy="${-PI/2} 0 ${-PI/2}" />-->
+  <!--</joint>-->
+
+  <!--<link name="up_camera_link">-->
+	<!--<visual>-->
+	  <!--<geometry>-->
+	    <!--<box size="0.044 0.029 0.096" />-->
+	  <!--</geometry>-->
+	  <!--<origin xyz="0 0 -0.048" />-->
+	  <!--<material name="black" />-->
+	<!--</visual>-->
+  <!--</link>-->
+  <!--<joint name="up_camera_joint" type="fixed">-->
+	<!--<parent link="board_link" />-->
+	<!--<child link="up_camera_link" />-->
+	<!--<origin xyz="-0.02 0 0.25" rpy="0 0 ${-PI/2}" />-->
+  <!--</joint>-->
+
+  <!--=========-->
+  <!-- HDL-32E -->
+  <!--=========-->
+
+  <!--<xacro:property name="velodyne_offset_length"   value="0.2" />-->
+  <!--<xacro:property name="left_velodyne_x_offset"   value="0.211" />-->
+
+  <!--<link name="velodyne_offset_link">-->
+    <!--<visual>-->
+      <!--<geometry>-->
+        <!--<box size="${velodyne_offset_length} ${sensor_board_width} ${sensor_board_height}"     />-->
+      <!--</geometry>-->
+      <!--<origin xyz="0 0 0"    />-->
+      <!--<material name="white" />-->
+    <!--</visual>-->
+  <!--</link>-->
+
+  <!--&lt;!&ndash; velodyne_offset_joint &ndash;&gt;-->
+  <!--<joint name="velodyne_offset_joint" type="fixed">-->
+    <!--<parent link="board_link" />-->
+    <!--<child  link="velodyne_offset_link" />-->
+    <!--<origin xyz ="${-(sensor_board_length-velodyne_offset_length)*0.5} 0 ${sensor_board_height}" />-->
+  <!--</joint>-->
+
+  <!-- left_velodyne -->
+  <HDL-32E name="left_velodyne" parent="board_link" color="violet">
+    <!-- <origin xyz="-0.15 0.20 0.29" rpy="${PI/4+1*PI/180} ${PI/4+4.2*PI/180} ${-PI-2*PI/180}"/> -->
+    <origin xyz="-0.15 0.13 0.29" rpy="${PI/4+1*PI/180} ${PI/4+4.2*PI/180} ${-PI-2*PI/180}"/>
+  </HDL-32E>
+
+  <!-- right_velodyne -->
+    <!-- Roll: red(front), Pitch: Green(left), Yaw: Blue(up) -->
+  <HDL-32E name="right_velodyne" parent="board_link" color="white">
+    <origin xyz="-0.20 -0.14 0.29" rpy="${PI/4-1*PI/180} ${-PI/4-5*PI/180} ${0-2*PI/180}"/>
+    <!-- <origin xyz="-0.15 -0.13 0.29" rpy="${1.038} ${0.454} ${-4.000}"/> -->
+  </HDL-32E>
+
+</robot>

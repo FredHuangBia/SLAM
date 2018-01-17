@@ -1,14 +1,17 @@
 <launch>
   <!-- True for simulation, false for real-time and bagfiles -->
+  <arg name="lidar" default="left"/>
   <param name="/use_sim_time" value="true"/>
   <param name="robot_description"
         command="$(find xacro)/xacro $(find star_jackal_mapper_description)/urdf/jackal.urdf.xacro --inorder" />
+
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find blam_example)/rviz/lidar_slam.rviz" />
   <node name="tf_odometry_baselink" pkg="velodyne_frame_tf" type="frame_tf_broadcaster" />
-  <node pkg="my_pcl_tutorial" name="left_velodyne_transform" type="left"></node>
-  <node pkg="my_pcl_tutorial" name="right_velodyne_transform" type="right"></node>
-  <node pkg="merge_pcl" name="merge" type="merge"></node>
+
+  <node pkg="my_pcl_tutorial" name="left_velodyne_transform" type="left" args="$(arg lidar)" if="$(eval lidar != 'right')" ></node>
+  <node pkg="my_pcl_tutorial" name="right_velodyne_transform" type="right" args="$(arg lidar)" if="$(eval lidar != 'left')" ></node>
+  <node pkg="merge_pcl" name="merge" type="merge" if="$(eval lidar == 'both')"></node>
 
   <group ns="blam">
     <!-- SLAM -->
