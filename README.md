@@ -1,3 +1,8 @@
+# 3D SLAM with Lidars
+![alt text](imgs/pip2.png "Pipline")
+![alt text](imgs/result1.png "result")
+![alt text](imgs/result2.png "result")
+
 # Usage
 
 First, catkin_make the two workspaces and source in the same order as your making process. Be sure to download and compile the BLAM package properly. The modified files are LaserLoopClosure.cc, test_online.launch, and lidar_slam.rviz. You may want to replace them before compilation. 
